@@ -1,0 +1,28 @@
+---
+title: 2. Multiple files
+layout: page
+---
+<input id="photo" type="file" multiple="">
+<div id="results"></div>
+<script type="module">
+import { Client, handle_file } from "https://cdn.jsdelivr.net/npm/@gradio/client/dist/index.min.js";
+
+async function loaded (reader, file) {
+  const client = await Client.connect("Spartanbell/bearId");
+  const result = await client.predict("/predict", {
+    img: handle_file(file),
+  });
+  console.log(result);
+	const label = result['data'][0]['confidences'][0]['label'];
+    const div = document.createElement ('div');
+    div.innerHTML = `<br/><img src="${reader.result}" width="300"> <p>${label}</p>`;
+    document.body.append(div);
+}
+function read(file) {
+	const reader = new FileReader();
+	reader.addEventListener('load', () => loaded(reader, file)) 
+	reader.readAsDataURL(file);
+    
+}
+photo.addEventListener('input', () => {[...photo.files].map(read) });
+</script>

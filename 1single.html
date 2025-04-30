@@ -1,0 +1,25 @@
+---
+title: 1. Single file
+layout: page
+---
+<input id="photo" type="file">
+<div id="results"></div>
+<script type="module">
+import { Client, handle_file } from "https://cdn.jsdelivr.net/npm/@gradio/client/dist/index.min.js";
+
+async function loaded (reader) {
+  const client = await Client.connect("Spartanbell/bearId");
+  const result = await client.predict("/predict", {
+    img: handle_file(photo.files[0]),
+  });
+	const label = result['data'][0]['confidences'][0]['label'];
+	results.innerHTML = `<br/><img src="${reader.result}" width="300"> <p>${label}</p>`
+}
+function read() {
+	const reader = new FileReader();
+	reader.addEventListener('load', () => loaded(reader)) 
+	reader.readAsDataURL(photo.files[0]);
+}
+//photo.addEventListener('input', loaded);
+photo.addEventListener('input', read);
+</script>
